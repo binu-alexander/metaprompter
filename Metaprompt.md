@@ -78,7 +78,7 @@ The AI will execute the task usually far better than with the raw Prompt :
 **Generated Example 1**
 ### RawPrompt  "Write me  simple PRD for a To do list app"
 ## Output Prompt
-
+```
 {
   "Role": "Product Manager",
   "Goal": "Create a simple Product Requirements Document (PRD) for a to-do list application",
@@ -108,14 +108,14 @@ The AI will execute the task usually far better than with the raw Prompt :
   "Examples": [],
   "AdditionalNotes": ""
 }
-
+```
 
 
 **Generated Example 2**
 
 ### RawPrompt  "Write me a story about Asterix and Obelix time travelling to India
 ### Output Prompt
-
+```
 {
   "Role": "Story Writer",
   "Goal": "Create a narrative about Asterix and Obelix traveling through time to India",
@@ -145,7 +145,7 @@ The AI will execute the task usually far better than with the raw Prompt :
   "Examples": [],
   "AdditionalNotes": ""
 }
-
+```
 ### 3. Save and Reuse
 
 Store the output JSON for consistent results across similar tasks.
