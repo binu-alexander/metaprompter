@@ -2,7 +2,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![GitHub stars](https://img.shields.io/github/stars/binu-alexander/metaprompter)
-![GitHub issues](https://img.shields.io/github/issues/binu-alexander/metaprompter)
+
 
 A simple meta-prompting approach that converts natural language requests into structured, reusable prompt templates. Transform any raw prompt into a standardized JSON format for consistent AI interactions.
 
