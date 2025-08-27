@@ -18,9 +18,10 @@ No new technology just a smart meta prompt  to cleanup your prompt and make it b
 
 That's it. Your raw prompt becomes an organized, scalable template and save it in your personal prompt library
 
-## Check out the ChaptGPT custom GPT based on this
 
-https://github.com/binu-alexander/metaprompter
+## Check out the ChaptGPT custom GPT based on this
+https://chatgpt.com/g/g-68ae8ac96ef881919bcaf175d44060b0-prompt-transformer
+
 
 
 ## License
