@@ -14,6 +14,8 @@ One transformation. Infinite reuse. And if you want to go one step further modif
 
 Replace `<USER_INPUT_HERE>` with your prompt in the markdown template file procided . Paste everything into your AI chat. Get structured JSON back.
 
+No new technology just a smart prompt to cleanup your prompt.
+
 That's it. Your raw prompt becomes an organized, scalable template and save it in your personal prompt library
 
 ## License
