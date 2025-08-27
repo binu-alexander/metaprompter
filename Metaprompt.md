@@ -3,25 +3,13 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 
-
-A simple meta-prompting approach that converts natural language requests into structured, reusable prompt templates. Transform any raw prompt into a standardized JSON format for consistent AI interactions.
+A simple meta-prompting approach that converts raw natural language requests into structured, reusable prompt templates. Transform any raw prompt into a structured JSON format for consistent AI interactions and outputs in any LLM.
 
 ## Overview
 
-The Prompt Transformer takes unstructured prompts and extracts key components like role, goals, constraints, and formatting requirements into a machine-readable template. Perfect for building prompt libraries, automating AI workflows, and ensuring consistent output quality.
-
-Turn informal messy prompts into structured templates.
-
-Transform "Write me a professional email declining a meeting" into a reusable JSON template with role, constraints, style, and format specifications. Perfect for building consistent AI workflows.
+The Prompt Transformer is a meta prompt that takes unstructured prompts and extracts key components like role, goals, constraints, and formatting requirements into a machine-readable template. Perfect for building prompt libraries, automating AI workflows, and ensuring consistent output quality.
 
 
-
-- Structure Extraction: Automatically identifies roles, goals, audience, and constraints
-- Format Standardization: Converts any prompt into consistent JSON structure
-- Intelligent Inference: Fills missing information with sensible defaults
-- Execution Prevention: Focuses on structure, not content generation
-- Zero Dependencies: Pure prompt template - works with any AI system
-  
 ## Features
 
 - **Structure Extraction**: Automatically identifies roles, goals, audience, and constraints
@@ -34,10 +22,10 @@ Transform "Write me a professional email declining a meeting" into a reusable JS
 
 ### 1. Copy and Customize
 
-Take the complete template below with User Input and  Transformer and replace `<USER_INPUT_HERE>` with your raw prompt:
+Take the entire template below with User Input and  Transformer and replace `<USER_INPUT_HERE>` with your raw prompt:
 
 ```
-# USER INPUT
+# USER INPUT - Raw Prompt goes here
 {
   "RawPrompt": "<USER_INPUT_HERE>"
 }
@@ -83,44 +71,85 @@ Take the complete template below with User Input and  Transformer and replace `<
 
 ### 2. Paste and Run
 
-**Paste the entire customized template into your AI chat as one message.** The AI will output structured JSON:
+**After proof reading and tweaking as needed, Paste the entire final JSON Output into your AI chat as one prompt.** 
+The AI will execute the task usually far better than with the raw Prompt :
 
-```json
+
+**Generated Example 1**
+### RawPrompt  "Write me  simple PRD for a To do list app"
+## Output Prompt
+
 {
-  "Role": "Email Assistant",
-  "Goal": "Decline meeting invitation professionally",
-  "Audience": "Workplace professionals",
-  "Context": "Business communication requiring polite refusal",
-  "Task": "Generate a courteous email declining a meeting invitation",
+  "Role": "Product Manager",
+  "Goal": "Create a simple Product Requirements Document (PRD) for a to-do list application",
+  "Audience": "Developers and stakeholders",
+  "Context": "The user requires a straightforward PRD to outline the development of a to-do list app with essential features.",
+  "Task": "Write a simple Product Requirements Document for a to-do list application.",
   "Instructions": [
-    "Use professional tone",
-    "Provide brief reason for declining",
-    "Suggest alternative if appropriate"
+    "Define the core features of the to-do list app, such as task creation, editing, and deletion.",
+    "Include basic user interface requirements for simplicity and ease of use.",
+    "Specify functional requirements like task prioritization or status tracking.",
+    "Ensure the PRD is concise and focused on essential functionality."
   ],
-  "OutputFormat": "text",
+  "OutputFormat": "markdown",
   "Constraints": {
-    "Positive": ["Maintain professional relationship", "Be concise"],
-    "Negative": ["Avoid detailed excuses", "Don't apologize excessively"]
+    "Positive": [
+      "Focus on simplicity and core functionality for the to-do list app.",
+      "Include clear, actionable requirements for developers."
+    ],
+    "Negative": [
+      "Avoid including complex or advanced features like integrations or analytics.",
+      "Do not include detailed technical implementation details."
+    ]
   },
-  "Style": "polite, professional, concise",
+  "Style": "clear, concise, professional",
   "CreativityLevel": "Low",
   "DataInput": "",
   "Examples": [],
   "AdditionalNotes": ""
 }
-```
+
+
+
+**Generated Example 2**
+
+### RawPrompt  "Write me a story about Asterix and Obelix time travelling to India
+### Output Prompt
+
+{
+  "Role": "Story Writer",
+  "Goal": "Create a narrative about Asterix and Obelix traveling through time to India",
+  "Audience": "General readers",
+  "Context": "The user seeks a fictional story involving the characters Asterix and Obelix experiencing a time-travel adventure set in India.",
+  "Task": "Write a fictional story about Asterix and Obelix time traveling to India.",
+  "Instructions": [
+    "Include Asterix and Obelix as the main characters.",
+    "Incorporate a time-travel mechanism to transport them to India.",
+    "Set the story in a historical or culturally rich Indian setting.",
+    "Ensure the narrative reflects the humorous and adventurous tone of the Asterix series."
+  ],
+  "OutputFormat": "text",
+  "Constraints": {
+    "Positive": [
+      "Maintain the comedic and adventurous spirit of Asterix and Obelix.",
+      "Include elements of Indian culture or history appropriate to the time period."
+    ],
+    "Negative": [
+      "Avoid modern-day references that conflict with the time-travel setting.",
+      "Do not alter the core personalities of Asterix and Obelix."
+    ]
+  },
+  "Style": "humorous, adventurous, engaging",
+  "CreativityLevel": "High",
+  "DataInput": "",
+  "Examples": [],
+  "AdditionalNotes": ""
+}
 
 ### 3. Save and Reuse
 
 Store the output JSON for consistent results across similar tasks.
 
-## Use Cases
-Perfect for prompt libraries, API integration, A/B testing, documentation, and team standardization.
-Customize the transformer itself for more specific use cases.
-
-
-## Key Fields
-**Role** • **Goal** • **Audience** • **Context** • **Instructions** • **Constraints** • **Style** • **OutputFormat**
 
 ## Tips
 - Be as detailed as you can even in your raw prompts
@@ -128,6 +157,10 @@ Customize the transformer itself for more specific use cases.
 - Adjust creativity level by task type
 - Test final prompts  before deployment
 - This should work in an LLM
+- You want go ahead adjust the transformer itself to suit your own needs.
+- Pro tip - use a text expander or snippet fillers to call the entire template at will whenver and wherever you need it.
+
+
 
 ## License
 MIT - use freely in any project. Star the repo if you like !
