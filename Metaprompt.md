@@ -160,10 +160,6 @@ Store the output JSON for consistent results across similar tasks.
 - You want go ahead adjust the transformer itself to suit your own needs.
 - Pro tip - use a text expander or snippet fillers to call the entire template at will whenver and wherever you need it.
 
-## Check out the ChaptGPT custom GPT based on this
-
-https://github.com/binu-alexander/metaprompter
-
 ## License
 MIT - use freely in any project. Star the repo if you like !
 
