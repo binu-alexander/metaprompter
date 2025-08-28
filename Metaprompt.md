@@ -153,14 +153,12 @@ Store the output JSON for consistent results across similar tasks.
 
 ## Tips
 - Be as detailed as you can even in your raw prompts
-- Review generated constraints and prompts to fine tune
-- Adjust creativity level by task type
-- Test final prompts  before deployment
-- This should work in an LLM
+- Review generated  JSON Prompt and fine tune
+- Adjust all parameters that you need granular control
+- Review final prompts  before usage
+- This should work in any LLM 
 - You want go ahead adjust the transformer itself to suit your own needs.
 - Pro tip - use a text expander or snippet fillers to call the entire template at will whenver and wherever you need it.
-
-
 
 ## License
 MIT - use freely in any project. Star the repo if you like !
