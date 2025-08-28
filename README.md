@@ -18,7 +18,7 @@ No new technology just a smart meta prompt  to cleanup your prompt and make it b
 
 That's it. Your raw prompt becomes an organized, scalable template and save it in your personal prompt library
 
-## See what can be done with this approach
+## See what can be done with this approach ( experimental )
 Custom GPT 
 https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler
 
