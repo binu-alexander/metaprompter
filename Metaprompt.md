@@ -181,7 +181,8 @@ The model will transform your raw request into a **structured, reusable template
 * Adjust parameters for **granular control**.
 * Reuse templates for **consistent results**.
 * Works in **any LLM**.
-* Pro tip → Use a snippet expander to quickly drop in the full transformer.
+* Pro tip → Use a snippet expander to quickly drop in the full transformer into any LLM chat
+* Checkout a custom GPT that is baed on this https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler-json
 
 ---
 
@@ -201,9 +202,3 @@ MIT – free to use in any project. ⭐ Star the repo if you find it useful!
 ---
 
 **Questions or Feedback?** Open an issue on GitHub.
-
----
-
-✅ This now uses **two universally relatable examples** (email + travel) instead of niche ones.
-
-Do you want me to also **add a short diagram section** (like we did in the academic version) to make the GitHub page more visual and engaging?
