@@ -10,7 +10,7 @@ Now you have a reusable template. Your team can use it. Your API can consume it.
 
 One transformation. Infinite reuse. And if you want to go one step further modify the transformer itself for your own needs 
 
-## How it works
+## How it works ( Reference  https://github.com/binu-alexander/metaprompter/edit/main/Metaprompt.md )
 
 Replace `<USER_INPUT_HERE>` with your prompt in the markdown template file procided . Paste everything into your AI chat. Get a nice detailed and  structured JSON Prompt back.
 
