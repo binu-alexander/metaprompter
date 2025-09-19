@@ -182,7 +182,7 @@ The model will transform your raw request into a **structured, reusable template
 * Reuse templates for **consistent results**.
 * Works in **any LLM**.
 * Pro tip → Use a snippet expander to quickly drop in the full transformer into any LLM chat
-* Checkout a custom GPT that is baed on this https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler-json
+* Checkout a custom GPT that is baed on this https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler-json 
 
 ---
 
