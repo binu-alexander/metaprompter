@@ -1,31 +1,52 @@
-# Prompt Transformer
+
+# Prompt Transformer and How it works
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+A simple **meta-prompting framework** that converts raw natural language requests into structured, reusable prompt templates.
+Transform any raw prompt into a structured JSON format for **consistent AI interactions** and **predictable outputs** across any LLM.
 
-A simple meta-prompting approach that converts raw natural language requests into structured, reusable prompt templates. Transform any raw prompt into a structured JSON format for consistent AI interactions and outputs in any LLM.
+---
 
 ## Overview
 
-The Prompt Transformer is a meta prompt that takes unstructured prompts and extracts key components like role, goals, constraints, and formatting requirements into a machine-readable template. Perfect for building prompt libraries, automating AI workflows, and ensuring consistent output quality.
+The Prompt Transformer is a **meta-prompt**  that takes unstructured user input and extracts key components—role, goals, constraints, and formatting requirements—into a **machine-readable JSON schema**.
 
+* Build reliable **prompt libraries**
+* Ensure **consistency, auditability, and reuse**
+---
 
 ## Features
 
-- **Structure Extraction**: Automatically identifies roles, goals, audience, and constraints
-- **Format Standardization**: Converts any prompt into consistent JSON structure  
-- **Intelligent Inference**: Fills missing information with sensible defaults
-- **Execution Prevention**: Focuses on structure, not content generation
-- **Zero Dependencies**: Pure prompt template - works with any AI system
+* **Structure Extraction** → Automatically identifies *Role, Goal, Audience, Context, and Constraints*
+* **Format Standardization** → Enforces consistent JSON schema
+* **Intelligent Inference** → Fills missing details with sensible defaults
+* **Execution Prevention** → Focuses only on structure, not content generation
+* **Zero Dependencies** → Works in any AI system (just copy the template)
+
+---
+
+## Workflow
+
+```mermaid
+flowchart LR
+    A[Raw Prompt] --> B[Prompt Transformer]
+    B --> C[Structured JSON Template]
+    C --> D[Execution by LLM]
+```
+
+**Figure:** The Prompt Transformer separates *prompt transformation* from *execution*.
+
+---
 
 ## Quick Start
 
 ### 1. Copy and Customize
 
-Take the entire template below with User Input and  Transformer and replace `<USER_INPUT_HERE>` with your raw prompt:
+Use the following **template**. Replace `<USER_INPUT_HERE>` with your raw prompt:
 
-```
-# USER INPUT - Raw Prompt goes here
+```json
+# USER INPUT
 {
   "RawPrompt": "<USER_INPUT_HERE>"
 }
@@ -41,12 +62,12 @@ Take the entire template below with User Input and  Transformer and replace `<US
     "Set 'Audience' based on the scenario (e.g., 'Workplace professionals', 'Developers', 'General readers').",
     "Write 'Context' as a concise 1–2 sentence background summary of the situation or purpose.",
     "Set 'OutputFormat' to one of: 'text', 'code', 'JSON', 'markdown', 'table', 'outline'. If uncertain, use 'text'.",
-    "Populate 'Constraints.Positive' and 'Constraints.Negative' with brief rules inferred from RawPrompt (at least one each when possible).",
-    "Set 'Style' with 2–4 adjectives matching tone (e.g., 'polite, professional, concise'). If unclear, use 'neutral, concise'.",
-    "Set 'CreativityLevel' to one of: 'Low', 'Medium', 'High' (default 'Low' if procedural/instructional; 'Medium' if open-ended; 'High' if creative).",
-    "Set 'DataInput' to an empty string after transformation (\"\").",
-    "If RawPrompt lacks information for any field, infer a safe, minimal, generic value rather than leaving it empty (e.g., Audience='General readers').",
-    "Output JSON only; no prose before or after. Do not generate domain content (no emails, code, essays, answers)."
+    "Populate 'Constraints.Positive' and 'Constraints.Negative' with brief rules inferred from RawPrompt.",
+    "Set 'Style' with 2–4 adjectives matching tone (default 'neutral, concise').",
+    "Set 'CreativityLevel' to 'Low', 'Medium', or 'High' depending on the task.",
+    "Set 'DataInput' to an empty string (\"\").",
+    "If RawPrompt lacks information for any field, infer a safe, generic value.",
+    "Output JSON only; no prose or domain-specific content."
   ],
   "TargetTemplate": {
     "Role": "",
@@ -69,40 +90,43 @@ Take the entire template below with User Input and  Transformer and replace `<US
 }
 ```
 
+---
+
 ### 2. Paste and Run
 
-**After proof reading and tweaking as needed, Paste the entire final JSON Output into your AI chat as one prompt.** 
-The AI will execute the task usually far better than with the raw Prompt :
+Copy the entire JSON into your LLM.
+The model will transform your raw request into a **structured, reusable template**.
 
+---
 
-**Generated Example 1**
-### RawPrompt  "Write me  simple PRD for a To do list app"
-## Output Prompt
-```
+## Examples
+
+### Example 1 – Professional Email
+
+**Raw Prompt**
+
+> Write an email to my manager asking for a day off next Friday.
+
+**Output (JSON)**
+
+```json
 {
-  "Role": "Product Manager",
-  "Goal": "Create a simple Product Requirements Document (PRD) for a to-do list application",
-  "Audience": "Developers and stakeholders",
-  "Context": "The user requires a straightforward PRD to outline the development of a to-do list app with essential features.",
-  "Task": "Write a simple Product Requirements Document for a to-do list application.",
+  "Role": "Email Assistant",
+  "Goal": "Draft a professional email requesting a day off from work next Friday",
+  "Audience": "Workplace manager",
+  "Context": "The user wants to formally request a single day off from work.",
+  "Task": "Write a polite email requesting a day off next Friday.",
   "Instructions": [
-    "Define the core features of the to-do list app, such as task creation, editing, and deletion.",
-    "Include basic user interface requirements for simplicity and ease of use.",
-    "Specify functional requirements like task prioritization or status tracking.",
-    "Ensure the PRD is concise and focused on essential functionality."
+    "Address the email formally to the manager.",
+    "Clearly state the request for leave on the specific date.",
+    "Keep the message polite and concise."
   ],
-  "OutputFormat": "markdown",
+  "OutputFormat": "text",
   "Constraints": {
-    "Positive": [
-      "Focus on simplicity and core functionality for the to-do list app.",
-      "Include clear, actionable requirements for developers."
-    ],
-    "Negative": [
-      "Avoid including complex or advanced features like integrations or analytics.",
-      "Do not include detailed technical implementation details."
-    ]
+    "Positive": ["Use professional tone", "Keep message short"],
+    "Negative": ["Avoid unnecessary personal details", "Do not include casual slang"]
   },
-  "Style": "clear, concise, professional",
+  "Style": "polite, professional, concise",
   "CreativityLevel": "Low",
   "DataInput": "",
   "Examples": [],
@@ -110,59 +134,73 @@ The AI will execute the task usually far better than with the raw Prompt :
 }
 ```
 
+---
 
-**Generated Example 2**
+### Example 2 – Travel Itinerary
 
-### RawPrompt  "Write me a story about Asterix and Obelix time travelling to India
-### Output Prompt
-```
+**Raw Prompt**
+
+> Plan a 3-day trip to Paris with sightseeing and local food recommendations.
+
+**Output (JSON)**
+
+```json
 {
-  "Role": "Story Writer",
-  "Goal": "Create a narrative about Asterix and Obelix traveling through time to India",
-  "Audience": "General readers",
-  "Context": "The user seeks a fictional story involving the characters Asterix and Obelix experiencing a time-travel adventure set in India.",
-  "Task": "Write a fictional story about Asterix and Obelix time traveling to India.",
+  "Role": "Travel Planner",
+  "Goal": "Create a 3-day travel itinerary for Paris with sightseeing and food experiences",
+  "Audience": "General travelers",
+  "Context": "The user is planning a short trip to Paris and wants recommendations for attractions and food.",
+  "Task": "Provide a structured 3-day itinerary for Paris.",
   "Instructions": [
-    "Include Asterix and Obelix as the main characters.",
-    "Incorporate a time-travel mechanism to transport them to India.",
-    "Set the story in a historical or culturally rich Indian setting.",
-    "Ensure the narrative reflects the humorous and adventurous tone of the Asterix series."
+    "Include morning, afternoon, and evening activities.",
+    "Suggest popular landmarks such as the Eiffel Tower and Louvre.",
+    "Add at least one local food or dining recommendation per day."
   ],
-  "OutputFormat": "text",
+  "OutputFormat": "table",
   "Constraints": {
-    "Positive": [
-      "Maintain the comedic and adventurous spirit of Asterix and Obelix.",
-      "Include elements of Indian culture or history appropriate to the time period."
-    ],
-    "Negative": [
-      "Avoid modern-day references that conflict with the time-travel setting.",
-      "Do not alter the core personalities of Asterix and Obelix."
-    ]
+    "Positive": ["Include cultural and culinary highlights", "Ensure activities are tourist-friendly"],
+    "Negative": ["Do not recommend overly expensive or niche activities"]
   },
-  "Style": "humorous, adventurous, engaging",
-  "CreativityLevel": "High",
+  "Style": "informative, engaging, practical",
+  "CreativityLevel": "Medium",
   "DataInput": "",
   "Examples": [],
   "AdditionalNotes": ""
 }
 ```
-### 3. Save and Reuse
-
-Store the output JSON for consistent results across similar tasks.
-
-
-## Tips
-- Be as detailed as you can even in your raw prompts
-- Review generated  JSON Prompt and fine tune
-- Adjust all parameters that you need granular control
-- Review final prompts  before usage
-- This should work in any LLM 
-- You want go ahead adjust the transformer itself to suit your own needs.
-- Pro tip - use a text expander or snippet fillers to call the entire template at will whenver and wherever you need it.
-
-## License
-MIT - use freely in any project. Star the repo if you like !
 
 ---
 
-**Questions and Feedback ?** Open an issue on GitHub.
+## Tips
+
+* Write raw prompts as **clearly as possible**.
+* Always **review and tweak** the generated JSON.
+* Adjust parameters for **granular control**.
+* Reuse templates for **consistent results**.
+* Works in **any LLM**.
+* Pro tip → Use a snippet expander to quickly drop in the full transformer.
+
+---
+
+## Roadmap
+
+* [ ] Add more ready-to-use template variations
+* [ ] Publish comparison benchmarks (raw vs structured prompts)
+* [ ] Extend examples for enterprise and research use cases
+* [ ] Integrate with downstream automation workflows
+
+---
+
+## License
+
+MIT – free to use in any project. ⭐ Star the repo if you find it useful!
+
+---
+
+**Questions or Feedback?** Open an issue on GitHub.
+
+---
+
+✅ This now uses **two universally relatable examples** (email + travel) instead of niche ones.
+
+Do you want me to also **add a short diagram section** (like we did in the academic version) to make the GitHub page more visual and engaging?
