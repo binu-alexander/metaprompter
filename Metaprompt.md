@@ -30,9 +30,11 @@ The Prompt Transformer is a **meta-prompt**  that takes unstructured user input 
 
 ```mermaid
 flowchart TD
-    A[Raw Prompt] --> B[Prompt Transformer]
-    B --> C[Structured JSON Template]
-    C --> D[Paste this prompt into a new LLM chat]
+    A[Raw Prompt] 
+    A --> B[Prompt Transformer - transforms but does not not execute]
+    B --> C[Smart Structured JSON Template]
+    C -->|Optional: Edit JSON| C2[Tweaked Structured JSON prompt as needed and additional context]
+    C2 --> D[Paste this final JSON prompt into new LLM chat - execution step]
 ```
 
 **Figure:** The Prompt Transformer separates *prompt transformation* from *execution*.
