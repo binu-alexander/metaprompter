@@ -32,9 +32,11 @@ The Prompt Transformer is a **meta-prompt**  that takes unstructured user input 
 flowchart TD
     A[Raw Prompt] 
     A --> B[Prompt Transformer - transforms but does not not execute]
-    B --> C[Smart Structured JSON Template]
-    C -->|Optional: Edit JSON| C2[Tweaked Structured JSON prompt as needed and additional context]
-    C2 --> D[Paste this final JSON prompt into new LLM chat - execution step]
+    B --> C[AI Generated Structured JSON Template]
+    C -->|Optional: Edit JSON as needed| C2[Final Structured JSON prompt as needed and additional context]
+    C2 --> D[Paste this final JSON prompt into new LLM chat - final execution step]
+    D  --> See the magic, better results with structured AI assisted prompting
+
 ```
 
 **Figure:** The Prompt Transformer separates *prompt transformation* from *execution*.
