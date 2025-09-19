@@ -29,10 +29,10 @@ The Prompt Transformer is a **meta-prompt**  that takes unstructured user input 
 ## Workflow
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Raw Prompt] --> B[Prompt Transformer]
     B --> C[Structured JSON Template]
-    C --> D[Execution by LLM ( after pasting in a new chat)]
+    C --> D[Paste this prompt into a new LLM chat]
 ```
 
 **Figure:** The Prompt Transformer separates *prompt transformation* from *execution*.
