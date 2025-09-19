@@ -10,16 +10,16 @@ Now you have a reusable template. Your team can use it. Your API can consume it.
 
 One transformation. Infinite reuse. And if you want to go one step further modify the transformer itself for your own needs 
 
-## How it works ( Reference  https://github.com/binu-alexander/metaprompter/edit/main/Metaprompt.md )
+## ( Reference  https://github.com/binu-alexander/metaprompter/edit/main/Metaprompt.md )
 
-Replace `<USER_INPUT_HERE>` with your prompt in the markdown template file procided . Paste everything into your AI chat. Get a nice detailed and  structured JSON Prompt back.
+## Get Started
+Replace `<USER_INPUT_HERE>` with your prompt in the markdown template file provided . 
 
-No new technology just a smart meta prompt  to cleanup your prompt and make it better.
+Paste everything into your AI chat. Get a nice detailed and  structured JSON Prompt back.
 
-That's it. Your raw prompt becomes an organized, scalable template and save it in your personal prompt library
-
-## See what can be done with this approach ( experimental )
-Custom GPT 
+ Your raw prompt becomes an organized, scalable template , use it a any new LLM chat to see the results.
+ 
+## Try out a Custom GPT
 https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler
 
 ## License
