@@ -35,7 +35,7 @@ flowchart TD
     B --> C[AI Generated Structured JSON Template]
     C -->|Optional: Edit JSON or add context| C2[Final Structured JSON Prompt]
     C2 --> D[Paste final JSON prompt into new LLM chat - Execution step]
-    D --> E[See the awesime results with structured AI-assisted prompting]
+    D --> E[See the awesome results with structured AI-assisted prompting]
 ```
 
 **Figure:** The Prompt Transformer separates *prompt transformation* from *execution*.
