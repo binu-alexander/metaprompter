@@ -1,4 +1,4 @@
-A Structured Framework for Prompt Transformer Templates within the Meta-Prompting Paradigm
+# A Structured Framework for Prompt Transformer Templates within the Meta-Prompting Paradigm
 
 ## Abstract
 
