@@ -4,7 +4,7 @@ You've written the same type of prompt dozens of times. "Write a professional em
 
 What if you could capture the perfect prompt structure once and remember and reuse it at will ?
 
-Prompt Transformer takes your messy, one-off prompts and extracts the underlying template. Feed it "Write a professional email declining a meeting" and get back a structured JSON with role, audience, tone, constraints, and format specs.
+_Prompt Transformer_ takes your messy, one-off prompts and extracts the underlying template. Feed it "Write a professional email declining a meeting" and get back a structured JSON with role, audience, tone, constraints, and format specs.
 
 Now you have a reusable template. Your team can use it. Your API can consume it. You can review it, version it, test variations, and build entire prompt libraries.
 
