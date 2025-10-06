@@ -14,7 +14,7 @@ One transformation. Infinite reuse. And if you want to go one step further modif
 https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler
 
 
-### Get Started without the Custom GPT 
+### Use the transformer directlu
 Replace `<USER_INPUT_HERE>` with your prompt in the markdown template file provided . 
 
 Paste everything into your AI chat session. Get a nice detailed, relevant and  structured JSON Prompt back.
