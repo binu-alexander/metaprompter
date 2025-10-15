@@ -194,6 +194,12 @@ The model will transform your raw request into a **structured, reusable template
 * [ ] Integrate with downstream automation workflows
 
 ---
+## JSON Prompts are powerful - look them up !
+
+https://mpgone.com/json-prompt-guide/
+https://mpgone.com/json-prompt-vs-text-prompts
+https://chatmaxima.com/blog/json-prompting-mastering-structured-inputs-for-ai-models/
+
 
 ## License
 
