@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prompt Transformer — Raw prompts → Structured JSON</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --accent: #06b6d4;
+      --accent-dim: rgba(6,182,212,0.12);
+      --accent-border: rgba(6,182,212,0.3);
+      --surface: #111317;
+      --surface-2: #17191f;
+      --surface-3: #1e2028;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8eaed;
+      --text-muted: #6b7280;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0b0d11;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* Noise grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* Glow blob */
+    .hero-glow {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(6,182,212,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      filter: blur(40px);
+    }
+
+    /* Glassmorphism card */
+    .card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .card:hover {
+      border-color: var(--accent-border);
+      transform: translateY(-2px);
+    }
+
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: #0b0d11;
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      font-weight: 500;
+      padding: 10px 22px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.15s, color 0.15s, transform 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--accent-border); color: var(--accent); transform: translateY(-1px); }
+
+    /* Step number */
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Code block */
+    .code-block {
+      background: #0d0f13;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .code-block-header {
+      background: var(--surface-3);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .code-label { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted); }
+
+    pre {
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* Syntax colors */
+    .k { color: #6272a4; }      /* key */
+    .s { color: #f1fa8c; }      /* string value */
+    .p { color: #6be5fd; }      /* punctuation / brace */
+    .n { color: #bd93f9; }      /* number/bool */
+    .c { color: var(--accent); } /* accent */
+    .raw { color: #ff79c6; }    /* raw prompt */
+
+    /* Arrow */
+    .arrow-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Feature icon */
+    .feat-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: var(--accent-dim);
+      border: 1px solid var(--accent-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    /* Divider line with glow */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-border), transparent);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 3px; }
+
+    section { position: relative; z-index: 1; }
+  </style>
+</head>
+<body>
+
+<!-- ─── NAV ─────────────────────────────────────────────────── -->
+<nav style="border-bottom:1px solid var(--border); backdrop-filter:blur(12px); background:rgba(11,13,17,0.8); position:sticky; top:0; z-index:50;">
+  <div style="max-width:1100px; margin:0 auto; padding:0 24px; height:56px; display:flex; align-items:center; justify-content:space-between;">
+    <span class="mono" style="font-size:14px; font-weight:600; color:var(--accent);">
+      <span style="color:var(--text-muted);">{ </span>prompt<span style="color:var(--text-muted);">→</span>json <span style="color:var(--text-muted);">}</span>
+    </span>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <a href="https://github.com/binu-alexander/metaprompter" target="_blank" class="btn-ghost" style="padding:7px 16px; font-size:13px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85.004 1.7.11 2.5.33 1.9-1.29 2.74-1.02 2.74-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+        GitHub
+      </a>
+      <a href="https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler" target="_blank" class="btn-primary" style="padding:7px 16px; font-size:13px;">
+        Try GPT →
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO ─────────────────────────────────────────────────── -->
+<section style="padding: 100px 24px 80px; text-align:center; overflow:hidden;">
+  <div class="hero-glow"></div>
+  <div style="max-width:720px; margin:0 auto; position:relative; z-index:1;">
+    <div class="badge" style="margin-bottom:28px;">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="5"/></svg>
+      Zero dependencies · Works in any LLM
+    </div>
+    <h1 style="font-size:clamp(38px, 6vw, 64px); font-weight:800; line-height:1.1; letter-spacing:-0.03em; margin-bottom:22px;">
+      Raw prompts →<br>
+      <span style="color:var(--accent);">Structured JSON</span>
+    </h1>
+    <p style="font-size:17px; color:var(--text-muted); max-width:520px; margin:0 auto 36px; line-height:1.65;">
+      One meta-prompt that extracts role, goal, audience, constraints, and format from any natural language request. Build reusable prompt libraries. Ship consistent AI outputs.
+    </p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <a href="https://github.com/binu-alexander/metaprompter" target="_blank" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.49.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02A9.56 9.56 0 0 1 12 6.8c.85.004 1.7.11 2.5.33 1.9-1.29 2.74-1.02 2.74-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12c0-5.52-4.48-10-10-10z"/></svg>
+        View on GitHub
+      </a>
+      <a href="https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler" target="_blank" class="btn-ghost">
+        Try Baxter GPT
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEATURES ─────────────────────────────────────────────── -->
+<section style="padding: 64px 24px;">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div style="text-align:center; margin-bottom:48px;">
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px;">What it does</h2>
+      <p style="color:var(--text-muted); font-size:15px;">Five primitives that make prompt engineering systematic.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+
+      <div class="card" style="padding:22px 20px; display:flex; flex-direction:column; gap:14px;">
+        <div class="feat-icon">🔍</div>
+        <div>
+          <p style="font-weight:600; font-size:14px; margin-bottom:5px;">Structure Extraction</p>
+          <p style="color:var(--text-muted); font-size:13px; line-height:1.55;">Pulls out Role, Goal, Audience, Context, and Constraints from any freeform input.</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:22px 20px; display:flex; flex-direction:column; gap:14px;">
+        <div class="feat-icon">📐</div>
+        <div>
+          <p style="font-weight:600; font-size:14px; margin-bottom:5px;">Format Standardization</p>
+          <p style="color:var(--text-muted); font-size:13px; line-height:1.55;">Enforces a consistent JSON schema — versionable, auditable, API-ready.</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:22px 20px; display:flex; flex-direction:column; gap:14px;">
+        <div class="feat-icon">🧠</div>
+        <div>
+          <p style="font-weight:600; font-size:14px; margin-bottom:5px;">Intelligent Inference</p>
+          <p style="color:var(--text-muted); font-size:13px; line-height:1.55;">Fills missing fields with safe, sensible defaults when your prompt is sparse.</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:22px 20px; display:flex; flex-direction:column; gap:14px;">
+        <div class="feat-icon">🛡️</div>
+        <div>
+          <p style="font-weight:600; font-size:14px; margin-bottom:5px;">Execution Prevention</p>
+          <p style="color:var(--text-muted); font-size:13px; line-height:1.55;">Transforms only — never fulfills the request. Separation of concerns built in.</p>
+        </div>
+      </div>
+
+      <div class="card" style="padding:22px 20px; display:flex; flex-direction:column; gap:14px;">
+        <div class="feat-icon">⚡</div>
+        <div>
+          <p style="font-weight:600; font-size:14px; margin-bottom:5px;">Zero Dependencies</p>
+          <p style="color:var(--text-muted); font-size:13px; line-height:1.55;">Pure text. Copy-paste into ChatGPT, Claude, Gemini, or any LLM chat.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width:1100px; margin:0 auto;"></div>
+
+<!-- ─── USAGE ─────────────────────────────────────────────────── -->
+<section style="padding: 80px 24px;">
+  <div style="max-width:760px; margin:0 auto;">
+    <div style="text-align:center; margin-bottom:52px;">
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px;">Get started in 3 steps</h2>
+      <p style="color:var(--text-muted); font-size:15px;">No setup. No API key. No install.</p>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:0;">
+
+      <div style="display:flex; gap:20px; align-items:flex-start; padding:24px 0;">
+        <div class="step-num">1</div>
+        <div>
+          <p style="font-weight:600; font-size:15px; margin-bottom:6px;">Copy the transformer template</p>
+          <p style="color:var(--text-muted); font-size:13.5px; line-height:1.6;">Grab the JSON template from <a href="https://github.com/binu-alexander/metaprompter/blob/main/Metaprompt.md" target="_blank" style="color:var(--accent); text-decoration:none;">Metaprompt.md</a>. It defines the transformation contract — what to extract and where to put it.</p>
+        </div>
+      </div>
+
+      <div style="height:1px; background:var(--border); margin-left:52px;"></div>
+
+      <div style="display:flex; gap:20px; align-items:flex-start; padding:24px 0;">
+        <div class="step-num">2</div>
+        <div>
+          <p style="font-weight:600; font-size:15px; margin-bottom:6px;">Replace <code class="mono" style="background:var(--surface-3); padding:2px 7px; border-radius:5px; font-size:12px; color:var(--accent);">&lt;USER_INPUT_HERE&gt;</code> with your prompt</p>
+          <p style="color:var(--text-muted); font-size:13.5px; line-height:1.6;">Drop in any raw natural language request — "write me a performance review", "summarize this paper", "generate a SQL migration". Messy is fine.</p>
+        </div>
+      </div>
+
+      <div style="height:1px; background:var(--border); margin-left:52px;"></div>
+
+      <div style="display:flex; gap:20px; align-items:flex-start; padding:24px 0;">
+        <div class="step-num">3</div>
+        <div>
+          <p style="font-weight:600; font-size:15px; margin-bottom:6px;">Paste into your LLM. Get structured JSON back.</p>
+          <p style="color:var(--text-muted); font-size:13.5px; line-height:1.6;">The model returns a fully populated template. Review, tweak, version it. Reuse it across chats, teams, or APIs. One transformation — infinite reuse.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width:1100px; margin:0 auto;"></div>
+
+<!-- ─── EXAMPLE ────────────────────────────────────────────────── -->
+<section style="padding: 80px 24px;">
+  <div style="max-width:1100px; margin:0 auto;">
+    <div style="text-align:center; margin-bottom:48px;">
+      <h2 style="font-size:28px; font-weight:700; letter-spacing:-0.02em; margin-bottom:10px;">See the transformation</h2>
+      <p style="color:var(--text-muted); font-size:15px;">One casual sentence in. Production-ready JSON template out.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center;">
+
+      <!-- Before -->
+      <div>
+        <p class="mono" style="font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing:0.08em;">INPUT</p>
+        <div class="code-block">
+          <div class="code-block-header">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-label">raw_prompt.txt</span>
+          </div>
+          <pre><span class="raw">"Write an email to my manager
+asking for a day off
+next Friday."</span></pre>
+        </div>
+      </div>
+
+      <!-- Arrow -->
+      <div class="arrow-box" style="padding-top:32px;">
+        <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+          <div style="width:42px; height:42px; border-radius:50%; background:var(--accent-dim); border:1px solid var(--accent-border); display:flex; align-items:center; justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+          <span class="mono" style="font-size:10px; color:var(--text-muted);">LLM</span>
+        </div>
+      </div>
+
+      <!-- After -->
+      <div>
+        <p class="mono" style="font-size:11px; color:var(--text-muted); margin-bottom:10px; letter-spacing:0.08em;">OUTPUT</p>
+        <div class="code-block">
+          <div class="code-block-header">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-label">template.json</span>
+          </div>
+          <pre><span class="p">{</span>
+  <span class="k">"Role"</span><span class="p">:</span> <span class="s">"Email Assistant"</span><span class="p">,</span>
+  <span class="k">"Goal"</span><span class="p">:</span> <span class="s">"Draft a professional leave request"</span><span class="p">,</span>
+  <span class="k">"Audience"</span><span class="p">:</span> <span class="s">"Workplace manager"</span><span class="p">,</span>
+  <span class="k">"OutputFormat"</span><span class="p">:</span> <span class="s">"text"</span><span class="p">,</span>
+  <span class="k">"CreativityLevel"</span><span class="p">:</span> <span class="s">"Low"</span><span class="p">,</span>
+  <span class="k">"Style"</span><span class="p">:</span> <span class="s">"polite, professional, concise"</span><span class="p">,</span>
+  <span class="k">"Constraints"</span><span class="p">: {</span>
+    <span class="k">"Positive"</span><span class="p">:</span> <span class="p">[</span><span class="s">"Use formal tone"</span><span class="p">,</span> <span class="s">"Be brief"</span><span class="p">],</span>
+    <span class="k">"Negative"</span><span class="p">:</span> <span class="p">[</span><span class="s">"No casual slang"</span><span class="p">]</span>
+  <span class="p">}</span>
+<span class="p">}</span></pre>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Workflow note -->
+    <div style="margin-top:36px; padding:18px 22px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; display:flex; align-items:center; gap:14px;">
+      <span style="font-size:18px;">💡</span>
+      <p style="font-size:13.5px; color:var(--text-muted); line-height:1.55;">
+        The transformer <strong style="color:var(--text);">separates transformation from execution</strong> — it never writes the email. Take the JSON, paste it into a new chat as your structured prompt, and get <em>consistent, predictable</em> output every time.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width:1100px; margin:0 auto;"></div>
+
+<!-- ─── CTA STRIP ─────────────────────────────────────────────── -->
+<section style="padding: 72px 24px; text-align:center;">
+  <div style="max-width:580px; margin:0 auto;">
+    <h2 style="font-size:26px; font-weight:700; letter-spacing:-0.02em; margin-bottom:12px;">Ready to build your prompt library?</h2>
+    <p style="color:var(--text-muted); font-size:15px; margin-bottom:32px;">Star the repo, copy the template, or jump straight into the Baxter GPT to try it live.</p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <a href="https://github.com/binu-alexander/metaprompter" target="_blank" class="btn-primary">
+        ⭐ Star on GitHub
+      </a>
+      <a href="https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler" target="_blank" class="btn-ghost">
+        Try Baxter GPT →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────────── -->
+<footer style="border-top:1px solid var(--border); padding:28px 24px;">
+  <div style="max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+    <span class="mono" style="font-size:13px; color:var(--text-muted);">
+      <span style="color:var(--accent);">prompt-transformer</span> · MIT License
+    </span>
+    <div style="display:flex; gap:20px; align-items:center;">
+      <a href="https://github.com/binu-alexander/metaprompter" target="_blank" style="color:var(--text-muted); font-size:13px; text-decoration:none; transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">GitHub</a>
+      <a href="https://github.com/binu-alexander/metaprompter/blob/main/Metaprompt.md" target="_blank" style="color:var(--text-muted); font-size:13px; text-decoration:none; transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Metaprompt</a>
+      <a href="https://chatgpt.com/g/g-68aea2a957a8819186af31f366b178df-baxter-prompt-butler" target="_blank" style="color:var(--text-muted); font-size:13px; text-decoration:none; transition:color 0.15s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-muted)'">Baxter GPT</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
